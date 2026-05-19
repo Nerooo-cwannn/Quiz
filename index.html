@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PHP & Coding Quiz</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- =====================================================
+       DEKORASI BACKGROUND (Grid + Orbs animasi)
+  ===================================================== -->
+  <div class="bg-grid"></div>
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+
+  <!-- =====================================================
+       APP WRAPPER
+  ===================================================== -->
+  <div class="app">
+
+    <!-- ================================================
+         SCREEN 1: HALAMAN AWAL (START)
+    ================================================ -->
+    <div id="screen-start" class="screen active">
+      <div class="start-card">
+
+        <!-- Logo & judul -->
+        <div class="logo-icon">⚡</div>
+        <h1 class="start-title">PHP QUIZ</h1>
+        <p class="start-subtitle">Test Your PHP &amp; Coding Skills</p>
+
+        <!-- Info singkat quiz -->
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="val">20</div>
+            <div class="lbl">Soal</div>
+          </div>
+          <div class="info-item">
+            <div class="val">5</div>
+            <div class="lbl">Pilihan</div>
+          </div>
+          <div class="info-item">
+            <div class="val">30m</div>
+            <div class="lbl">Waktu</div>
+          </div>
+        </div>
+
+        <!-- Skor terakhir (diisi oleh JS dari localStorage) -->
+        <div class="last-score-box" id="last-score-info">
+          Belum ada skor sebelumnya.
+        </div>
+
+        <!-- Tombol mulai -->
+        <button class="btn btn-primary" onclick="startQuiz()">
+          🚀 Mulai Quiz
+        </button>
+
+      </div>
+    </div><!-- end #screen-start -->
+
+
+    <!-- ================================================
+         SCREEN 2: HALAMAN QUIZ
+    ================================================ -->
+    <div id="screen-quiz" class="screen">
+
+      <!-- Header: Timer | Counter | Tombol Selesai -->
+      <div class="quiz-header">
+        <div class="timer-box" id="timer-display">
+          <span class="timer-icon">⏱</span>
+          <span id="timer-text">30:00</span>
+        </div>
+        <div class="q-counter">
+          Soal <strong id="q-current">1</strong> / <strong>20</strong>
+        </div>
+        <button class="btn btn-danger btn-finish-early" onclick="openModal()">
+          ✓ Selesai
+        </button>
+      </div>
+
+      <!-- Progress bar + dot navigator -->
+      <div class="progress-wrap">
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+        </div>
+        <!-- Dot tombol nomor soal (diisi oleh JS) -->
+        <div class="q-dots" id="q-dots"></div>
+      </div>
+
+      <!-- Kartu soal (nomor, teks soal, daftar pilihan — diisi oleh JS) -->
+      <div class="question-card" id="question-card">
+        <div class="q-number" id="q-number">SOAL 01</div>
+        <div class="q-text" id="q-text"></div>
+        <div class="options-list" id="options-list"></div>
+      </div>
+
+      <!-- Tombol navigasi bawah -->
+      <div class="quiz-nav">
+        <button class="btn btn-secondary" id="btn-prev" onclick="prevQuestion()">
+          ← Sebelumnya
+        </button>
+        <button class="btn btn-primary" id="btn-next" onclick="nextQuestion()">
+          Selanjutnya →
+        </button>
+      </div>
+
+    </div><!-- end #screen-quiz -->
+
+
+    <!-- ================================================
+         SCREEN 3: HALAMAN HASIL (RESULT)
+    ================================================ -->
+    <div id="screen-result" class="screen">
+      <div class="result-card">
+
+        <!-- Header hasil -->
+        <div class="result-header">
+          <div class="result-trophy" id="result-trophy">🏆</div>
+          <h2 class="result-title" id="result-title">Quiz Selesai!</h2>
+          <p class="result-subtitle" id="result-subtitle">Berikut hasil akhir kamu</p>
+        </div>
+
+        <!-- Tampilan skor besar -->
+        <div class="score-display">
+          <div class="score-big" id="score-big">0</div>
+          <div class="score-total">dari 20 soal</div>
+          <div class="score-pct" id="score-pct">0%</div>
+        </div>
+
+        <!-- Statistik: benar / salah / dilewati -->
+        <div class="result-stats">
+          <div class="stat-box">
+            <div class="stat-val correct" id="stat-correct">0</div>
+            <div class="stat-lbl">✅ Benar</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val wrong" id="stat-wrong">0</div>
+            <div class="stat-lbl">❌ Salah</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val skip" id="stat-skip">0</div>
+            <div class="stat-lbl">⏭ Dilewati</div>
+          </div>
+        </div>
+
+        <!-- Toggle review jawaban -->
+        <div class="review-toggle">
+          <button class="btn btn-secondary" onclick="toggleReview()">
+            📋 Lihat Review Jawaban
+          </button>
+        </div>
+
+        <!-- Daftar review jawaban (diisi oleh JS, tersembunyi default) -->
+        <div class="review-section" id="review-section" style="display:none">
+          <div class="review-title">Review Jawaban</div>
+          <div class="review-list" id="review-list"></div>
+        </div>
+
+        <!-- Tombol aksi -->
+        <div class="result-actions">
+          <button class="btn btn-primary" onclick="restartQuiz()">
+            🔄 Ulangi Quiz
+          </button>
+          <button class="btn btn-secondary" onclick="goHome()">
+            🏠 Beranda
+          </button>
+        </div>
+
+      </div>
+    </div><!-- end #screen-result -->
+
+  </div><!-- end .app -->
+
+
+  <!-- =====================================================
+       MODAL: Konfirmasi Selesai Quiz
+  ===================================================== -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-icon">❓</div>
+      <div class="modal-title">Selesaikan Quiz?</div>
+      <div class="modal-text" id="modal-text">
+        Kamu baru menjawab <strong id="modal-answered">0</strong> dari 20 soal.<br>
+        Soal yang belum dijawab dianggap salah.
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal()">Lanjutkan</button>
+        <button class="btn btn-primary" onclick="finishQuiz()">Ya, Selesai</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- External JavaScript -->
+  <script src="script.js"></script>
+
+</body>
+</html>
